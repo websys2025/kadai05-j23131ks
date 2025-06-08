@@ -16,8 +16,8 @@
         async function some_api(myForm) {
             // ここにコードを書く
             const areaCode = myForm.form_data.value;
-            const url = `https://www.jma.go.jp/bosai/forecast/data/forecast/${areaCode}.json`;
-            const response = await fetch(url);
+            const endpoint = `https://www.jma.go.jp/bosai/forecast/data/forecast/${areaCode}.json`;
+            const response = await fetch(endpoint);
             const data = await response.json();
 
             const areaName = data[0].timeSeries[0].areas[0].area.name;
