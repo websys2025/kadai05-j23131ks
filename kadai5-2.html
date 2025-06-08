@@ -1,20 +1,35 @@
-<html lang="ja">
+<html lang="ja"> 
 <head>
     <meta charset="utf-8">
     <title>演習課題5-2：外部APIの呼び出しテスト</title>
 </head>
 <body>
-    <h1 id="msg">何かのAPI</h1>
+    <h1 id="msg">千葉県の天気予報（気象庁API）</h1>
     <form name="apiform"><p>
-        何かのフォーム：<input type="text" name="form_data">
+        地域コード（千葉県は 120000）：<input type="text" name="form_data" value="120000">
         <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
     </p></form>
     
-    <div id="result"></div>
+    <div id="result">ここに結果が表示されます。</div>
+
     <script>
         async function some_api(myForm) {
             // ここにコードを書く
-            document.getElementById("result").innerHTML += myForm.form_data.value+"<br />";
+            const areaCode = myForm.form_data.value;
+            const endpoint = `https://www.jma.go.jp/bosai/forecast/data/forecast/${areaCode}.json`;
+            const response = await fetch(endpoint);
+            const data = await response.json();
+
+            const areaName = data[0].timeSeries[0].areas[0].area.name;
+            const weatherList = data[0].timeSeries[0].areas[0].weathers;
+            const dateList = data[0].timeSeries[0].timeDefines;
+
+            let resultHtml = `<strong>${areaName}の天気予報：</strong><br>`;
+            for (let i = 0; i < weatherList.length; i++) {    　　　//天気予報の日付分を取得
+                resultHtml += `${new Date(dateList[i]).toLocaleDateString()}：${weatherList[i]}<br>`;
+            }
+
+            document.getElementById("result").innerHTML = resultHtml;
             document.apiform.reset();
         }
     </script>
