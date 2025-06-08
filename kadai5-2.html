@@ -1,21 +1,29 @@
-<html lang="ja">
+<html lang="ja"> 
 <head>
     <meta charset="utf-8">
     <title>演習課題5-2：外部APIの呼び出しテスト</title>
 </head>
 <body>
-    <h1 id="msg">何かのAPI</h1>
+    <h1 id="msg">千葉県の現在の天気</h1>
     <form name="apiform"><p>
-        何かのフォーム：<input type="text" name="form_data">
-        <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
+        天気を見るには「実行」をクリック：
+        <button type="button" id="btn1" onclick="some_api()">実行</button>
     </p></form>
     
-    <div id="result"></div>
+    <div id="result">結果はここに表示されます。</div>
     <script>
-        async function some_api(myForm) {
+        async function some_api() {
             // ここにコードを書く
-            document.getElementById("result").innerHTML += myForm.form_data.value+"<br />";
-            document.apiform.reset();
+            const endpoint = "https://api.open-meteo.com/v1/forecast?latitude=35.6&longitude=140.1&current_weather=true";
+            const response = await fetch(endpoint);
+            const data = await response.json();
+
+            const weather = data.current_weather;
+            const message = `千葉県の現在の天気：<br>
+                気温：${weather.temperature}℃<br>
+                風速：${weather.windspeed} km/h<br>
+
+            document.getElementById("result").innerHTML = message;
         }
     </script>
 </body>
