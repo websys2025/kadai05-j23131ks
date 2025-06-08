@@ -4,26 +4,33 @@
     <title>演習課題5-2：外部APIの呼び出しテスト</title>
 </head>
 <body>
-    <h1 id="msg">千葉県の現在の天気</h1>
+    <h1 id="msg">千葉県の天気予報（気象庁API）</h1>
     <form name="apiform"><p>
-        天気を見るには「実行」をクリック：
-        <button type="button" id="btn1" onclick="some_api()">実行</button>
+        地域コード（千葉県は 120000）：<input type="text" name="form_data" value="120000">
+        <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
     </p></form>
     
-    <div id="result">結果はここに表示されます。</div>
+    <div id="result">ここに結果が表示されます。</div>
+
     <script>
-        async function some_api() {
+        async function some_api(myForm) {
             // ここにコードを書く
-            const endpoint = "https://api.open-meteo.com/v1/forecast?latitude=35.6&longitude=140.1&current_weather=true";
-            const response = await fetch(endpoint);
+            const areaCode = myForm.form_data.value;
+            const url = `https://www.jma.go.jp/bosai/forecast/data/forecast/${areaCode}.json`;
+            const response = await fetch(url);
             const data = await response.json();
 
-            const weather = data.current_weather;
-            const message = `千葉県の現在の天気：<br>
-                気温：${weather.temperature}℃<br>
-                風速：${weather.windspeed} km/h<br>
+            const areaName = data[0].timeSeries[0].areas[0].area.name;
+            const weatherList = data[0].timeSeries[0].areas[0].weathers;
+            const dateList = data[0].timeSeries[0].timeDefines;
 
-            document.getElementById("result").innerHTML = message;
+            let resultHtml = `<strong>${areaName}の天気予報：</strong><br>`;
+            for (let i = 0; i < weatherList.length; i++) {    　　　//天気予報の日付分を取得
+                resultHtml += `${new Date(dateList[i]).toLocaleDateString()}：${weatherList[i]}<br>`;
+            }
+
+            document.getElementById("result").innerHTML = resultHtml;
+            document.apiform.reset();
         }
     </script>
 </body>
